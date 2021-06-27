@@ -87,12 +87,12 @@ public class Game_Manager : MonoBehaviourPunCallbacks
         Debug.LogError("OnJoinedRoom");
 
 
-        if (usedPotalNum ==1)
+        if (usedPotalNum == 1)
         {
            
             PhotonNetwork.LoadLevel("Game1");
         }
-        else if (usedPotalNum ==2)
+        else if (usedPotalNum == 2)
         {
            
             PhotonNetwork.LoadLevel("Game2");
