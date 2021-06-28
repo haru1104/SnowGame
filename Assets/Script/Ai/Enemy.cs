@@ -4,8 +4,10 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviourPunCallbacks
 {
     public enum State
     {
@@ -69,7 +71,9 @@ public class Enemy : MonoBehaviour
         nav = GetComponent<NavMeshAgent>();
         bothp = GetComponent<BotHp>().Botsli;
         sceneName = SceneManager.GetActiveScene().name;
-       
+        ChackNav();
+
+
     }
 
 
@@ -98,10 +102,16 @@ public class Enemy : MonoBehaviour
     }
     void Update()
     {
-        // Debug.Log(weaponSet);
-        ChackState();
-        UpdateState();
-
+        if (PhotonNetwork.IsMasterClient == false)
+        {
+            return;
+        }
+        else
+        {
+            Debug.LogError(photonView.ViewID);
+            ChackState();
+            UpdateState();
+        }
     }
     private void Idle()
     {     
@@ -409,4 +419,12 @@ public class Enemy : MonoBehaviour
             }
         }
     }
+    void ChackNav()
+    {
+        if (PhotonNetwork.IsConnected == true && PhotonNetwork.IsMasterClient == false)
+        {
+            nav.enabled=false;
+        }
+    }
+
 }

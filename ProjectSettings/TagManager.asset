@@ -27,6 +27,8 @@ TagManager:
   - jumpButton
   - PlayerNickName
   - GameManager
+  - Bullet
+  - PlayerLoding
   layers:
   - Default
   - TransparentFX

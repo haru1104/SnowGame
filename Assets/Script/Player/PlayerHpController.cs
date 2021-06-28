@@ -30,22 +30,28 @@ public class PlayerHpController : MonoBehaviourPunCallbacks
     }
     private void OnTriggerEnter(Collider other)
     {
-        float max = HpController.value;
-        if (other.tag == "SnowBall")
+        if (photonView.IsMine == true)
         {
-            HpController.value = max - 0.10f;
-            Destroy(other.gameObject);
+            if (other.tag == "SnowBall")
+            {
+               
+                Destroy(other.gameObject);
+                photonView.RPC("CheckHp", RpcTarget.AllBuffered, 0.1f);
+    
+            }
+            if (other.tag == "RedSnowBall")
+            {
+              
+                Destroy(other.gameObject);
+                photonView.RPC("CheckHp", RpcTarget.AllBuffered, 0.12f);
+            }
+            if (other.tag == "BlueSnowBall")
+            {
+                
+                Destroy(other.gameObject); 
+                photonView.RPC("CheckHp", RpcTarget.AllBuffered,0.15f);
+            }
 
-        }
-        if (other.tag == "RedSnowBall")
-        {
-            HpController.value = max - 0.12f;
-            Destroy(other.gameObject);
-        }
-        if (other.tag == "BlueSnowBall")
-        {
-            HpController.value = max - 0.15f;
-            Destroy(other.gameObject);
         }
     }
     private void SceneCheck() 
@@ -68,6 +74,12 @@ public class PlayerHpController : MonoBehaviourPunCallbacks
     private void DestoryPlayerSlider()
     {
         HpController.gameObject.SetActive(false);
+    }
+    [PunRPC]
+    private void CheckHp(float Damage)
+    {
+        float max = HpController.value;
+        HpController.value = max - 0.15f;
     }
     private void HpCheck()
     {

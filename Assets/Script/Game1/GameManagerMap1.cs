@@ -18,6 +18,7 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks
     [SerializeField]
     private GameObject botBox;
     private GameObject player;
+    private GameObject playerLoding;
     [SerializeField]
     private Transform redCreateBoxSpawnPosition;
     [SerializeField]
@@ -34,7 +35,7 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks
     private Text winnerkill;
     
     [SerializeField]
-    private int botSpawnCount;
+    private int botSpawnCount=2;
     private int giftBoxMaxCount=5;
     private int randomX, randomZ;
     private int SetSceneNum = 1;
@@ -46,7 +47,7 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks
     public bool redBoxSpawn = false;
     public bool gameOver = false;
     private int countDown = 3; // 3초후 게임을 시작하는 ui 띄우는 작업 해야함.
-
+    private bool _botSpawn = false;
     private int startCount = 0;
     public int playerKillCount=0;
     public int botKillCount=0;
@@ -61,6 +62,7 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
+        BotSpawn();
         Score();
         CreateBox();
         GiftSpawn();
@@ -68,9 +70,13 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks
         ChackGameOver();
         Botdle();
         Score();
+        
     }
     void StartSet()
     {
+        playerLoding = GameObject.FindGameObjectWithTag("PlayerLoding");
+        playerLoding.SetActive(false);
+
         Debug.Log("spawn");
         playerSpawnPoint = GameObject.FindGameObjectWithTag("PlayerSpawnPoint").GetComponent<Transform>();
         botSpawnPoint.Add(GameObject.FindWithTag("BotSpawnPoint").gameObject.GetComponent<Transform>());
@@ -84,6 +90,7 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks
 
     void SpawnSet()
     {
+        playerLoding.SetActive(true);
         //PlayerSetting
         player =PhotonNetwork.Instantiate("Player", playerSpawnPoint.position, Quaternion.identity);
         playerSlider = player.GetComponentInChildren<Slider>();
@@ -91,12 +98,21 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks
         camSet.Follow=player.transform;
         camSet.LookAt = player.transform;
         //BotSpawnSetting
-        for (int i = 0; i < botSpawnCount; i++)
-        {
-            GameObject go = (GameObject)Instantiate(botPrefab, botSpawnPoint[i].position, botSpawnPoint[i].rotation);
-            bot.Add(go.GetComponent<Enemy>());
-        }
 
+    
+    }
+    void BotSpawn()
+    {
+        if (PhotonNetwork.CurrentRoom.Players.Count != 1 && PhotonNetwork.IsMasterClient == true &&_botSpawn == false)
+        {
+            playerLoding.SetActive(false);
+            for (int i = 0; i < botSpawnCount; i++)
+            {
+                GameObject go = PhotonNetwork.Instantiate("Bot", botSpawnPoint[i].position, botSpawnPoint[i].rotation);
+                bot.Add(go.GetComponent<Enemy>());
+            }
+            _botSpawn = true;
+        }
     }
     void GiftSpawn()
     {
@@ -107,7 +123,7 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks
             randomX = Random.Range(-25, 25);
             randomZ = Random.Range(-11, 11);
             Vector3 giftpos = new Vector3(randomX, 2.6f, randomZ);
-            Instantiate(giftBoxPrefab[random], giftpos, Quaternion.identity);
+           PhotonNetwork.Instantiate("RandomBox", giftpos, Quaternion.identity);
         }
     }
     void CreateBox()
