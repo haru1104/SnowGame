@@ -146,7 +146,8 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks
             if (bot[i].isDead == true)
             {
                 blueScore += 1000;
-                StartCoroutine("BotReSpawn", i);
+                // StartCoroutine("BotReSpawn", i);
+                BotReSpawn(i);
             }
         }
         if (player.GetComponent<PlayerController>().isDead == true)
@@ -207,11 +208,11 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks
     {
 
     }
-    IEnumerator BotReSpawn(int i)
+    private void BotReSpawn(int i)
     {
-        yield return new WaitForSeconds(5f);
-        Destroy(bot[i].gameObject);
-        GameObject temp = Instantiate(botPrefab, botSpawnPoint[i].position,botSpawnPoint[i].rotation);
+        
+        PhotonNetwork.Destroy(bot[i].gameObject);
+        GameObject temp = PhotonNetwork.Instantiate("Bot", botSpawnPoint[i].position,botSpawnPoint[i].rotation);
         bot[i] = temp.GetComponent<Enemy>();
     }
     IEnumerator PlayerReSpawn()
