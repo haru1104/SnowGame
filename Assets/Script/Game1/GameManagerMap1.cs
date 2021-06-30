@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.SceneManagement;
-public class GameManagerMap1 : MonoBehaviourPunCallbacks
+public class GameManagerMap1 : MonoBehaviourPunCallbacks , IPunObservable
 {
     
     [SerializeField]
@@ -123,19 +123,32 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks
             randomX = Random.Range(-25, 25);
             randomZ = Random.Range(-11, 11);
             Vector3 giftpos = new Vector3(randomX, 2.6f, randomZ);
-           PhotonNetwork.Instantiate("RandomBox", giftpos, Quaternion.identity);
+
+            if (random >= 2)
+            {
+                PhotonNetwork.Instantiate("RandomBox", giftpos, Quaternion.identity);
+            }
+            else if(random  >= 4)
+            {
+                PhotonNetwork.Instantiate("RandomBox2", giftpos, Quaternion.identity);
+            }
+            else if (random >= 6)
+            {
+                PhotonNetwork.Instantiate("RandomBOx", giftpos, Quaternion.identity);
+            }
+           
         }
     }
     void CreateBox()
     {
         if (blueBoxSpawn == false)
         {
-            GameObject targetBlueBox = Instantiate(createBox, blueCreateBoxSpawnPosition.position, blueCreateBoxSpawnPosition.rotation);
+            GameObject targetBlueBox = PhotonNetwork.Instantiate("TargetBox", blueCreateBoxSpawnPosition.position, blueCreateBoxSpawnPosition.rotation);
             blueBoxSpawn = true;
         }
         if (redBoxSpawn == false)
         {
-            GameObject targetRedBox = Instantiate(botBox, redCreateBoxSpawnPosition.position, redCreateBoxSpawnPosition.rotation);
+            GameObject targetRedBox =PhotonNetwork.Instantiate("TargetBox", redCreateBoxSpawnPosition.position, redCreateBoxSpawnPosition.rotation);
             redBoxSpawn = true;
         }
     }
@@ -145,17 +158,30 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks
         {
             if (bot[i].isDead == true)
             {
-                blueScore += 1000;
+                photonView.RPC("ScoreRpc", RpcTarget.AllBuffered, 1);
                 // StartCoroutine("BotReSpawn", i);
                 BotReSpawn(i);
             }
         }
         if (player.GetComponent<PlayerController>().isDead == true)
         {
-            redScore += 1000;
+            photonView.RPC("ScoreRpc", RpcTarget.AllBuffered, 2);
             StartCoroutine("PlayerReSpawn");
         }
     }
+    [PunRPC]
+    private void ScoreRpc(int i)
+    {
+        if (i == 1 )
+        {
+            blueScore += 1000;
+        }
+        else
+        {
+            redScore += 1000;
+        }
+    }
+
     void ChackGameOver()
     {
         if (gameOver == true)
@@ -172,7 +198,7 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks
         }
         else
         {
-            Destroy(collision.gameObject);
+            PhotonNetwork.Destroy(collision.gameObject);
         }
     }
     private void Botdle()//임시로 제작 나중에 게임 제작후 제거 요망(shift Key 입력시 Bot제거)
@@ -222,5 +248,19 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks
         playerSlider.value = 1;
         player.GetComponent<PlayerController>().isDead = false;
         playerAni.SetBool("Die", false);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(playerKillCount);
+            stream.SendNext(botKillCount);
+        }
+        else
+        {
+            playerKillCount = (int)stream.ReceiveNext();
+            botKillCount = (int)stream.ReceiveNext();
+        }
     }
 }

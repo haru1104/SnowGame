@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class TargetBox : MonoBehaviour
+public class TargetBox : MonoBehaviourPunCallbacks
 {
     private Slider boxSlider;
     private float damage;
@@ -29,7 +31,7 @@ public class TargetBox : MonoBehaviour
     {
         if (other.tag == "Axe")
         {
-            boxSlider.value -= damage;
+            photonView.RPC("HpRpc",RpcTarget.AllBuffered);
         }
     }
     private void ChackSlider()
@@ -39,12 +41,17 @@ public class TargetBox : MonoBehaviour
             bot = GameObject.FindGameObjectsWithTag("bot");
             for (int i = 0; i < bot.Length; i++)
             {
-                Destroy(bot[i]);
+               PhotonNetwork.Destroy(bot[i]);
             }
             gameObject.SetActive(false);
             gameOver = true;
             gm.gameOverScene.SetActive(true);
         }
     }
-   
+
+   [PunRPC]
+   private void HpRpc()
+    {
+        boxSlider.value -= damage;
+    }
 }

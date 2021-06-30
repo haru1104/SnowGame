@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-public class PlayerAttack : MonoBehaviour
+using Photon.Pun;
+using Photon.Realtime;
+public class PlayerAttack : MonoBehaviourPunCallbacks 
 {
     [SerializeField]
     private Transform SnowSpawnPoint;
@@ -67,25 +69,25 @@ public class PlayerAttack : MonoBehaviour
     }
     public void AttackSet()
     {
-        if (axeOn != true)
+        if (axeOn != true && photonView.IsMine == true)
         {
             if (NomalSnow == true)
             {
-                GameObject ballSpawn = Instantiate(SnowBallPrefab, SnowSpawnPoint.position, Quaternion.identity);
+                GameObject ballSpawn =PhotonNetwork.Instantiate("SnowBall", SnowSpawnPoint.position, Quaternion.identity);
                 ballSpawn.GetComponent<Rigidbody>().AddForce(SnowSpawnPoint.forward * SnowBallSpeed);
                 ballSpawn.GetComponent<Rigidbody>().AddForce(Vector3.up * SnowBallUpForce);
                 Destroy(ballSpawn.gameObject, 5);
             }
             else if (RedSnow == true)
             {
-                GameObject ballSpawn = Instantiate(RadSnowBallPrefab, SnowSpawnPoint.position, Quaternion.identity);
+                GameObject ballSpawn = PhotonNetwork.Instantiate("RedSnowBall", SnowSpawnPoint.position, Quaternion.identity);
                 ballSpawn.GetComponent<Rigidbody>().AddForce(SnowSpawnPoint.forward * SnowBallSpeed);
                 ballSpawn.GetComponent<Rigidbody>().AddForce(Vector3.up * SnowBallUpForce);
                 Destroy(ballSpawn.gameObject, 10);
             }
             else if (BlueSnow == true)
             {
-                GameObject ballSpawn = Instantiate(BlueSnowBallPrefab, SnowSpawnPoint.position, Quaternion.identity);
+                GameObject ballSpawn = PhotonNetwork.Instantiate("BlueSnowBall", SnowSpawnPoint.position, Quaternion.identity);
                 ballSpawn.GetComponent<Rigidbody>().AddForce(SnowSpawnPoint.forward * SnowBallSpeed);
                 ballSpawn.GetComponent<Rigidbody>().AddForce(Vector3.up * SnowBallUpForce);
                 Destroy(ballSpawn.gameObject, 10);
@@ -102,19 +104,10 @@ public class PlayerAttack : MonoBehaviour
     }
     public void OnClikAxeButton()
     {
-        if (axeOn == false)
+        if (photonView.IsMine == true)
         {
-            go = Instantiate(axePrefab, axePos.position, axePos.rotation);
-            //부모오브젝트 하위로 들어가게 만드는 설정.
-            //부모의 좌표를 받아와서 같이 동작하게 만들게 하려고 사용함.
-            go.transform.parent = axePos.transform;
-            axeOn = true;
-            go.transform.Rotate(90, 0, 0);
-        }
-        else if (axeOn == true)
-        {
-            Destroy(go.gameObject);
-            axeOn = false;
+            //AxeRpc();
+            photonView.RPC("AxeRpc", RpcTarget.AllBuffered);
         }
     }
     public void GameSceneChack()
@@ -165,5 +158,23 @@ public class PlayerAttack : MonoBehaviour
     private void ButtonSet()
     {
         attackButton.onClick.AddListener(AttackChack);
+    }
+    [PunRPC]
+   void AxeRpc()
+    {
+        if (axeOn == false)
+        {
+            go = PhotonNetwork.Instantiate("Axe", axePos.position, axePos.rotation);
+            //부모오브젝트 하위로 들어가게 만드는 설정.
+            //부모의 좌표를 받아와서 같이 동작하게 만들게 하려고 사용함.
+            go.transform.parent = axePos.transform;
+            axeOn = true;
+            go.transform.Rotate(90, 0, 0);
+        }
+        else if (axeOn == true)
+        {
+            PhotonNetwork.Destroy(go.gameObject);
+            axeOn = false;
+        }
     }
 }

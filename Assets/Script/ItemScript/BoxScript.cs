@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class BoxScript : MonoBehaviour
+public class BoxScript : MonoBehaviourPunCallbacks
 {
 
     private GameObject player;
@@ -37,22 +39,22 @@ public class BoxScript : MonoBehaviour
             if (random >= 0 && random <= 1)
             {
                 player.GetComponent<PlayerAttack>().SetNumber = 2;
-                Destroy(gameObject);              
+                PhotonNetwork.Destroy(gameObject);              
             }
             else if (random >= 2 && random <= 3)
             {
                 player.GetComponent<PlayerAttack>().SetNumber = 1;
-                Destroy(gameObject);                
+                PhotonNetwork.Destroy(gameObject);                
             }
             else if (random >= 4 && random <= 8)
             {
                 player.GetComponent<PlayerAttack>().SetNumber = 0;
-                Destroy(gameObject);               
+                PhotonNetwork.Destroy(gameObject);               
             }
             else
             {
                 player.GetComponent<PlayerAttack>().SetNumber = 3;
-                Destroy(gameObject);               
+                PhotonNetwork.Destroy(gameObject);               
             }
             
         }
@@ -75,22 +77,22 @@ public class BoxScript : MonoBehaviour
                     if (random >= 0 && random <= 1)
                     {
                       enemy[i].weaponSet = 2;
-                        Destroy(gameObject);
+                        PhotonNetwork.Destroy(gameObject);
                     }
                     else if (random >= 2 && random <= 3)
                     {
                         enemy[i].weaponSet = 1;
-                        Destroy(gameObject);
+                        PhotonNetwork.Destroy(gameObject);
                     }
                     else if (random >= 4 && random <= 8)
                     {
                         enemy[i].weaponSet = 0;
-                        Destroy(gameObject);
+                        PhotonNetwork.Destroy(gameObject);
                     }
                     else
                     {
                         enemy[i].weaponSet = 3;
-                        Destroy(gameObject);
+                        PhotonNetwork.Destroy(gameObject);
                     }
                 }
             }

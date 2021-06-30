@@ -229,7 +229,7 @@ public class Enemy : MonoBehaviourPunCallbacks
     void ChackState()
     {
 
-        if (bothp.value <= 0.1&&CurrentState != State.Dead)
+        if (bothp.value <= 0.1&&CurrentState != State.Dead && photonView.IsMine==true)
         {
             if (SceneManager.GetActiveScene().name == "Game1")
             {
@@ -255,6 +255,7 @@ public class Enemy : MonoBehaviourPunCallbacks
             }
         }
     }
+   
     void Dead()
     {
         Debug.Log("DEAD");
@@ -269,7 +270,7 @@ public class Enemy : MonoBehaviourPunCallbacks
     {
        if (nomalSnow == true && axeIsHand == false)
        {
-           GameObject botballSpawn = Instantiate(SnowBallPrefab, SnowSpawnPoint.position, Quaternion.identity);
+           GameObject botballSpawn =PhotonNetwork.Instantiate("SnowBall", SnowSpawnPoint.position, Quaternion.identity);
            botballSpawn.GetComponent<Rigidbody>().AddForce(SnowSpawnPoint.forward * SnowBallSpeed);
            botballSpawn.GetComponent<Rigidbody>().AddForce(Vector3.up * SnowBallUpForce);
            Destroy(botballSpawn.gameObject, 5);
@@ -277,29 +278,34 @@ public class Enemy : MonoBehaviourPunCallbacks
        }
        else if (redSnow == true && axeIsHand == false)
        {
-           GameObject botballSpawn = Instantiate(RadSnowBallPrefab, SnowSpawnPoint.position, Quaternion.identity);
+           GameObject botballSpawn = PhotonNetwork.Instantiate("RedSnowBall", SnowSpawnPoint.position, Quaternion.identity);
            botballSpawn.GetComponent<Rigidbody>().AddForce(SnowSpawnPoint.forward * SnowBallSpeed);
            botballSpawn.GetComponent<Rigidbody>().AddForce(Vector3.up * SnowBallUpForce);
            Destroy(botballSpawn.gameObject, 10);
        }
        else if (blueSnow == true && axeIsHand == false)
        {
-           GameObject botballSpawn = Instantiate(BlueSnowBallPrefab, SnowSpawnPoint.position, Quaternion.identity);
+           GameObject botballSpawn = PhotonNetwork.Instantiate("BlueSnowBall", SnowSpawnPoint.position, Quaternion.identity);
            botballSpawn.GetComponent<Rigidbody>().AddForce(SnowSpawnPoint.forward * SnowBallSpeed);
            botballSpawn.GetComponent<Rigidbody>().AddForce(Vector3.up * SnowBallUpForce);
            Destroy(botballSpawn.gameObject, 10);
        }
        else if (axeIsHand == true)
        {
-            if (axeInHand == null)
-            {
-                axeInHand = Instantiate(Axe, handPos.transform.position, handPos.rotation);
-               axeInHand.transform.Rotate(90, 0, 0);
-            }
-            axeInHand.transform.parent = handPos.transform;
-           
-           return;
+            photonView.RPC("AxeRpc", RpcTarget.AllBuffered);
        }
+    }
+    [PunRPC]
+    private void AxeRpc()
+    {
+        if (axeInHand == null)
+        {
+            axeInHand = PhotonNetwork.Instantiate("Axe", handPos.transform.position, handPos.rotation);
+            axeInHand.transform.Rotate(90, 0, 0);
+        }
+        axeInHand.transform.parent = handPos.transform;
+
+        return;
     }
     private void SetWeapon()
     {
@@ -355,7 +361,7 @@ public class Enemy : MonoBehaviourPunCallbacks
         {
             targetBoxFind = false;
             axeIsHand = false;
-            Destroy(axeInHand.gameObject);
+            PhotonNetwork.Destroy(axeInHand.gameObject);
             CurrentState = State.Find;
         }
         if (weaponSet != 20 && boxPickUp == false)
