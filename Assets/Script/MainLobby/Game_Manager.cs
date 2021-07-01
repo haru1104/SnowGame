@@ -15,6 +15,10 @@ public class Game_Manager : MonoBehaviourPunCallbacks
     private bool sliderDes = false;
     public int usedPotalNum = 0;//포탈에 따라서 어디로 이동했는데 체크 해주는 int값
 
+    private void Start()
+    {
+       // Screen.SetResolution(1920, 1080, true);
+    }
     public void LeaveRoom()//방을 나가게하는 메소드
     {
         if (PhotonNetwork.CurrentRoom.Name == "Lobby") // 방이름이 로비라면 룸을 나간다,

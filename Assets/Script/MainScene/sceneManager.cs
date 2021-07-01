@@ -11,6 +11,7 @@ public class sceneManager : MonoBehaviour
     public bool touch = false;
     private void Start()
     {
+       // Screen.SetResolution(1920, 1080, true);
         input.gameObject.SetActive(false);
         img.gameObject.SetActive(false);
     }

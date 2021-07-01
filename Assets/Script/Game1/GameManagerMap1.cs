@@ -74,6 +74,7 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks , IPunObservable
     }
     void StartSet()
     {
+       // Screen.SetResolution(1920, 1080, true);
         playerLoding = GameObject.FindGameObjectWithTag("PlayerLoding");
         playerLoding.SetActive(false);
 
@@ -245,11 +246,15 @@ public class GameManagerMap1 : MonoBehaviourPunCallbacks , IPunObservable
     {
         yield return new WaitForSeconds(5f);
         player.transform.position = playerSpawnPoint.position;
-        playerSlider.value = 1;
+        photonView.RPC("HpSet", RpcTarget.AllBuffered);
         player.GetComponent<PlayerController>().isDead = false;
         playerAni.SetBool("Die", false);
     }
-
+    [PunRPC]
+    private void HpSet()
+    {
+        playerSlider.value = 1;
+    }
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
