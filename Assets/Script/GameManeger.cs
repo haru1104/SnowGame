@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class GameManeger : MonoBehaviourPunCallbacks
+public class GameManeger : MonoBehaviourPunCallbacks ,IPunObservable
 {
     public GameObject playerSet;
     GameObject Player;
@@ -34,6 +34,7 @@ public class GameManeger : MonoBehaviourPunCallbacks
     public Text killCount;
     public int playerKill = 0;//플레이어가 킬한거
     public int botkill = 0;//봇이 킬한거
+    public int PlayerGetPoint = 0;
 
     //private int PlayerSpawnCount=0;
     //public List<GameObject> span = new List<GameObject>();//불루 레드 
@@ -47,11 +48,15 @@ public class GameManeger : MonoBehaviourPunCallbacks
         Player = PhotonNetwork.Instantiate("Player", spawnPosition.transform.position, Quaternion.identity);
         playerSlider = Player.GetComponentInChildren<Slider>();
         playerAni = Player.GetComponent<Animator>();
-        for (int i = 0; i < EnemyCount; i++)
+        if (PhotonNetwork.IsMasterClient == true)
         {
-            GameObject obj = Instantiate(enemyPrefab, enemySpawn.transform.position, Quaternion.identity);
-            enemySet.Add(obj.GetComponent<Enemy>());
+            for (int i = 0; i < EnemyCount; i++)
+            {
+                GameObject obj =PhotonNetwork.Instantiate("Bot", enemySpawn.transform.position, Quaternion.identity);
+                enemySet.Add(obj.GetComponent<Enemy>());
+            }
         }
+        
     }
 
     // Update is called once per frame
@@ -82,7 +87,7 @@ public class GameManeger : MonoBehaviourPunCallbacks
     }
     private void Respawn()
     {
-        Player = Instantiate(playerSet, spawnPosition.transform.position, Quaternion.identity);
+        Player =PhotonNetwork.Instantiate("Player", spawnPosition.transform.position, Quaternion.identity);
        
         playerAni.SetBool("Die", false);
     }
@@ -96,6 +101,9 @@ public class GameManeger : MonoBehaviourPunCallbacks
         {
             GameOverScreen.SetActive(true);
         }
+        PlayerGetPoint = PlayerPrefs.GetInt("Coin");
+        PlayerGetPoint =+ int.Parse(blueGetCoin.text);
+        PlayerPrefs.SetInt("Coin",PlayerGetPoint);
     }
     private void DeadCount()
     {
@@ -136,10 +144,25 @@ public class GameManeger : MonoBehaviourPunCallbacks
     IEnumerator BotReSpawn(int i)
     {
         yield return new WaitForSeconds(4);
-        Destroy(enemySet[i].gameObject);
-        GameObject obj = Instantiate(enemyPrefab, enemySpawn.transform.position, Quaternion.identity);
+        PhotonNetwork.Destroy(enemySet[i].gameObject);
+        GameObject obj =PhotonNetwork.Instantiate("Bot", enemySpawn.transform.position, Quaternion.identity);
         enemySet[i] = obj.GetComponent<Enemy>();
         Debug.Log(spawnCount);
     }
-    
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(botkill);
+            stream.SendNext(playerKill);
+            stream.SendNext(gameoverChack);
+        }
+        else
+        {
+            botkill = (int)stream.ReceiveNext();
+            playerKill = (int)stream.ReceiveNext();
+            gameoverChack = (bool)stream.ReceiveNext();
+        }
+    }
 }
