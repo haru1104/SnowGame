@@ -13,9 +13,12 @@ public class NpcScript : MonoBehaviour
     private Transform playerTr;
     public GameObject petSpawnButton;
     public int random;
+    private int playerCoin;
     private bool isAnimals=false;
     private string textBox= "Do you want a pet?";
     private string textBox2 = "Greed is a bad thing";
+    private string textbox3 = "You don't have any money.";
+    private string textbox4 = "You make money.(5 Coin) ";
     private void Start()
     {
         canvas = gameObject.transform.GetChild(1).gameObject;
@@ -68,15 +71,46 @@ public class NpcScript : MonoBehaviour
         }
         
     }
-  
+     IEnumerator typing2()
+    {
+        for (int i = 0; i < textbox3.Length; i++)
+        {
+            tx.text = "";
+            tx.text = textbox3.Substring(0, i);
+            yield return new WaitForSeconds(0.10f);
+        }
+        if (petSpawnButton != null)
+        {
+            petSpawnButton.SetActive(true);
+        }
+        yield return new WaitForSeconds(2.0f);
+
+        for (int i = 0; i < textbox4.Length; i++)
+        {
+            tx.text = "";
+            tx.text = textbox4.Substring(0, i);
+            yield return new WaitForSeconds(0.10f);
+        }
+    }
     public void YesClick()
     {
         if (isAnimals == false)
         {
-            playerTr = GameObject.FindWithTag("Player").transform;
-            random = Random.Range(0, 3);
-            GameObject pet = Instantiate(animalsPrefab[random], new Vector3(playerTr.position.x, playerTr.position.y, playerTr.position.z - 1), Quaternion.identity);
-            isAnimals = true;
+            playerCoin = PlayerPrefs.GetInt("Coin");
+            playerCoin = playerCoin - 10;
+            if (playerCoin <= 0)
+            {
+                canvas.SetActive(true);
+                StartCoroutine("typing2");
+            }
+            else
+            {
+                PlayerPrefs.SetInt("Coin", playerCoin);
+                playerTr = GameObject.FindWithTag("Player").transform;
+                random = Random.Range(0, 3);
+                GameObject pet = Instantiate(animalsPrefab[random], new Vector3(playerTr.position.x, playerTr.position.y, playerTr.position.z - 1), Quaternion.identity);
+                isAnimals = true;
+            }
         }
         else if (isAnimals == true)
         {

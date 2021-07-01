@@ -9,6 +9,8 @@ public class GameOver : MonoBehaviour
     private Text redPoint;
     private Text redScore;
     private GameManagerMap1 gm;
+
+    private int setcoin;
     
     // Start is called before the first frame update
     void Start()
@@ -33,5 +35,8 @@ public class GameOver : MonoBehaviour
         bluePoint.text = "Get Point : " + gm.botKillCount * 5;
         redScore.text = "Player Kills : " + gm.playerKillCount;
         redPoint.text = "Get Point :" + gm.playerKillCount * 5;
+        setcoin = PlayerPrefs.GetInt("Coin");
+        setcoin += int.Parse(bluePoint.text);
+        PlayerPrefs.GetInt("Coin", setcoin);
     }
 }
