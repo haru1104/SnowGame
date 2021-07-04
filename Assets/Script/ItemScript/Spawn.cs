@@ -12,8 +12,14 @@ public class Spawn : MonoBehaviourPunCallbacks
     private float spawnX;
     private float spawnZ;
     private float spawnY;
+    private float delayTime = 4;
+    private float timeSet = 0;
     private Vector3 location = Vector3.zero;
- 
+
+    private void Start()
+    {
+       // StartCoroutine("BoxSpawner");
+    }
 
     // Update is called once per frame
     void Update()
@@ -27,11 +33,15 @@ public class Spawn : MonoBehaviourPunCallbacks
 
             location = new Vector3(spawnX, spawnY, spawnZ);
 
-            if (count < 4)
+            timeSet += Time.deltaTime;
+
+            if (timeSet >= delayTime)
             {
-                StartCoroutine("BoxSpawner");
-                count++;
+                GameObject WorldSpawnBox = PhotonNetwork.Instantiate("RandomBox", location, Quaternion.identity);
+                timeSet = 0;
             }
+
+           
         }
         else
         {
@@ -39,10 +49,6 @@ public class Spawn : MonoBehaviourPunCallbacks
         }
     }
 
-    IEnumerator BoxSpawner()
-    {
-        yield return new WaitForSeconds(6);
-        GameObject WorldSpawnBox = PhotonNetwork.Instantiate("RandomBox", location, Quaternion.identity);
-    }
+ 
 
 }

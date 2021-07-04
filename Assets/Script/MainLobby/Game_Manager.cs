@@ -72,11 +72,11 @@ public class Game_Manager : MonoBehaviourPunCallbacks
         Debug.LogError("OnJoinedLobby");
         if (usedPotalNum == 1)
         {
-            PhotonNetwork.JoinOrCreateRoom("Game1", new RoomOptions { MaxPlayers = 2 }, TypedLobby.Default);
+            PhotonNetwork.JoinOrCreateRoom("Game1", new RoomOptions { MaxPlayers = 20 }, TypedLobby.Default);
         }
         else if (usedPotalNum ==2)
         {
-            PhotonNetwork.JoinOrCreateRoom("Game2", new RoomOptions { MaxPlayers = 2 }, TypedLobby.Default);
+            PhotonNetwork.JoinOrCreateRoom("Game2", new RoomOptions { MaxPlayers = 20 }, TypedLobby.Default);
         }
         else
         {

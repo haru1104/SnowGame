@@ -9,8 +9,8 @@ public class TextBox : MonoBehaviour
 
     public void Start()
     {
-        PlayerPrefs.SetInt("Coin", 0);
-        PlayerPrefs.SetInt("Cash", 0);
+        PlayerPrefs.SetInt("Coin", 10);
+        PlayerPrefs.SetInt("Cash", 999);
     }
     public void ButtonClick()
     {
