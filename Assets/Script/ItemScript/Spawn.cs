@@ -37,7 +37,7 @@ public class Spawn : MonoBehaviourPunCallbacks
 
             if (timeSet >= delayTime)
             {
-                GameObject WorldSpawnBox = PhotonNetwork.Instantiate("RandomBox", location, Quaternion.identity);
+                GameObject WorldSpawnBox = PhotonNetwork.Instantiate(boxPrefab[boxType].name, location, Quaternion.identity);
                 timeSet = 0;
             }
 

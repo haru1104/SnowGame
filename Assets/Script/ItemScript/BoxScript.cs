@@ -102,7 +102,7 @@ public class BoxScript : MonoBehaviourPunCallbacks
   {
         if (player == null)
         {
-            Debug.Log("Á¶ º´Ù");
+            Debug.Log("Player Is Null");
         }
       
         player.GetComponent<PlayerAttack>().NomalSnow = false;

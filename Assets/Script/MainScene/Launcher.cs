@@ -15,7 +15,7 @@ public class Launcher : MonoBehaviourPunCallbacks //punCollBacks 붙이는 이유는 �
     private void Awake()
     {
         PhotonNetwork.AutomaticallySyncScene = true;//포톤에서 자동으로 로딩된 모든 씬을 동기화해주는 프로퍼티
-        DebugText = GameObject.Find("FuckingUnity").GetComponent<Text>();
+        DebugText = GameObject.Find("DebugText").GetComponent<Text>();
     }
     public void JoinServer() 
     {
